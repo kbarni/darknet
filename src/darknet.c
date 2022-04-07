@@ -24,6 +24,7 @@ extern void run_nightmare(int argc, char **argv);
 extern void run_dice(int argc, char **argv);
 extern void run_compare(int argc, char **argv);
 extern void run_classifier(int argc, char **argv);
+extern void run_segmenter(int argc, char **argv);
 extern void run_char_rnn(int argc, char **argv);
 extern void run_vid_rnn(int argc, char **argv);
 extern void run_tag(int argc, char **argv);
@@ -496,6 +497,8 @@ int main(int argc, char **argv)
 		int ext_output = find_arg(argc, argv, "-ext_output");
         char *filename = (argc > 4) ? argv[4]: 0;
         test_detector("cfg/coco.data", argv[2], argv[3], filename, thresh, 0.5, 0, ext_output, 0, NULL, 0, 0);
+    } else if (0 == strcmp(argv[1], "segmenter")){
+        run_segmenter(argc, argv);
     } else if (0 == strcmp(argv[1], "cifar")){
         run_cifar(argc, argv);
     } else if (0 == strcmp(argv[1], "go")){

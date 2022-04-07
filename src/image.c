@@ -36,6 +36,25 @@ float get_color(int c, int x, int max)
     return r;
 }
 
+image mask_to_rgb(image mask)
+{
+    int n = mask.c;
+    image im = make_image(mask.w, mask.h, 3);
+    int i, j;
+    for(j = 0; j < n; ++j){
+        int offset = j*123457 % n;
+        float red = get_color(2,offset,n);
+        float green = get_color(1,offset,n);
+        float blue = get_color(0,offset,n);
+        for(i = 0; i < im.w*im.h; ++i){
+            im.data[i + 0*im.w*im.h] += mask.data[j*im.h*im.w + i]*red;
+            im.data[i + 1*im.w*im.h] += mask.data[j*im.h*im.w + i]*green;
+            im.data[i + 2*im.w*im.h] += mask.data[j*im.h*im.w + i]*blue;
+        }
+    }
+    return im;
+}
+
 static float get_pixel(image m, int x, int y, int c)
 {
     assert(x < m.w && y < m.h && c < m.c);
@@ -825,9 +844,32 @@ image float_to_image_scaled(int w, int h, int c, float *data)
 
 image float_to_image(int w, int h, int c, float *data)
 {
-    image out = make_empty_image(w,h,c);
-    out.data = data;
-    return out;
+    if(c<5) {
+        // Copy the image data directly for 1-4 channels
+        image out = make_empty_image(w,h,c);
+        out.data = data;
+        return out;
+    } else {
+        //Convert the image data to classes
+        printf("c = %d, w = %d, h = %d\n", c, w, h);
+        image out = make_image(w,h,1);
+        for(int ii=0; ii<w*h; ii++){
+            int max_id = 0;
+            float max_value = 0;
+            for(int jj = 0; jj < c; ++jj){
+                if(max_value < data[jj*w*h + ii]){
+                    max_value = data[jj*w*h + ii];
+                    max_id = jj;
+                }
+            }
+            if(max_value > 0.05){
+                out.data[ii] = (float)max_id/255.0;
+            }else{
+                out.data[ii] = 0;
+            }
+        }
+        return out;
+    }
 }
 
 

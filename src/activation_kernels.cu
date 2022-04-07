@@ -198,7 +198,7 @@ __global__ void binary_activate_array_kernel(float *x, int n, int s, BINARY_ACTI
     if (id < n) y[id] = x1*x2;
 }
 
-extern "C" void binary_activate_array_gpu(float *x, int n, int size, BINARY_ACTIVATION a, float *y)
+extern "C" void binary_activate_array_ongpu(float *x, int n, int size, BINARY_ACTIVATION a, float *y)
 {
     binary_activate_array_kernel << <cuda_gridsize(n / 2), BLOCK, 0, get_cuda_stream() >> >(x, n / 2, size, a, y);
     CHECK_CUDA(cudaPeekAtLastError());
