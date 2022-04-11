@@ -47,11 +47,13 @@ void backward_scale_cpu(float *x_norm, float *delta, int batch, int n, int size,
 void mean_delta_cpu(float *delta, float *variance, int batch, int filters, int spatial, float *mean_delta);
 void  variance_delta_cpu(float *x, float *delta, float *mean, float *variance, int batch, int filters, int spatial, float *variance_delta);
 void normalize_delta_cpu(float *x, float *mean, float *variance, float *mean_delta, float *variance_delta, int batch, int filters, int spatial, float *delta);
+void l2normalize_cpu(float *x, float *dx, int batch, int filters, int spatial);
 
 void smooth_l1_cpu(int n, float *pred, float *truth, float *delta, float *error);
 void l2_cpu(int n, float *pred, float *truth, float *delta, float *error);
 void weighted_sum_cpu(float *a, float *b, float *s, int num, float *c);
 
+void logistic_x_ent_cpu(int n, float *pred, float *truth, float *delta, float *error);
 void softmax(float *input, int n, float temp, float *output, int stride);
 void upsample_cpu(float *in, int w, int h, int c, int batch, int stride, int forward, float scale, float *out);
 void softmax_cpu(float *input, int n, int batch, int batch_offset, int groups, int group_offset, int stride, float temp, float *output);
@@ -99,6 +101,7 @@ void gradient_centralization_gpu(int w, int h, int c, int f, float *in);
 void mean_gpu(float *x, int batch, int filters, int spatial, float *mean);
 void variance_gpu(float *x, float *mean, int batch, int filters, int spatial, float *variance);
 void normalize_gpu(float *x, float *mean, float *variance, int batch, int filters, int spatial);
+void l2normalize_gpu(float *x, float *dx, int batch, int filters, int spatial);
 
 void normalize_delta_gpu(float *x, float *mean, float *variance, float *mean_delta, float *variance_delta, int batch, int filters, int spatial, float *delta);
 
@@ -123,6 +126,7 @@ void scale_bias_gpu(float *output, float *biases, int batch, int n, int size);
 void add_bias_gpu(float *output, float *biases, int batch, int n, int size);
 void backward_bias_gpu(float *bias_updates, float *delta, int batch, int n, int size);
 
+void logistic_x_ent_gpu(int n, float *pred, float *truth, float *delta, float *error);
 void softmax_x_ent_gpu(int n, float *pred, float *truth, float *delta, float *error);
 void smooth_l1_gpu(int n, float *pred, float *truth, float *delta, float *error);
 void l2_gpu(int n, float *pred, float *truth, float *delta, float *error);
