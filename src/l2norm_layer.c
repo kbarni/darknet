@@ -42,7 +42,6 @@ void forward_l2norm_layer(const layer l, network_state state)
 
 void backward_l2norm_layer(const layer l, network_state state)
 {
-    //axpy_cpu(l.inputs*l.batch, 1, l.scales, 1, l.delta, 1);
     axpy_cpu(l.inputs*l.batch, 1, l.delta, 1, state.delta, 1);
 }
 
@@ -50,14 +49,14 @@ void backward_l2norm_layer(const layer l, network_state state)
 
 void forward_l2norm_layer_gpu(const layer l, network_state state)
 {
-    copy_ongpu(l.outputs*l.batch, state.input_gpu, 1, l.output_gpu, 1);
+    copy_ongpu(l.outputs*l.batch, state.input, 1, l.output_gpu, 1);
     l2normalize_gpu(l.output_gpu, l.scales_gpu, l.batch, l.out_c, l.out_w*l.out_h);
 }
 
 void backward_l2norm_layer_gpu(const layer l, network_state state)
 {
     axpy_ongpu(l.batch*l.inputs, 1, l.scales_gpu, 1, l.delta_gpu, 1);
-    axpy_ongpu(l.batch*l.inputs, 1, l.delta_gpu, 1, state.delta_gpu, 1);
+    axpy_ongpu(l.batch*l.inputs, 1, l.delta_gpu, 1, state.delta, 1);
 }
 
 #endif

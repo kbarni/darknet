@@ -55,24 +55,14 @@ void backward_logistic_layer(const layer l, network_state state)
 void forward_logistic_layer_gpu(const layer l, network_state state)
 {
     int i, j, k;
-    copy_ongpu(l.outputs*l.batch, state.input, 1, l.output_gpu, 1);//*** state.input_gpu ???
+    copy_ongpu(l.outputs*l.batch, state.input, 1, l.output_gpu, 1);
     activate_array_ongpu(l.output_gpu, l.outputs*l.batch, LOGISTIC);
     cuda_pull_array(l.output_gpu, state.input, l.batch*l.inputs);
-    //cuda_pull_array(net.truth_gpu, net.truth, l.batch*l.inputs);
-    //image im = make_image(1024, 512, 1);
-    //image im_truth = make_image(1024, 512, 1);
     for(i=0; i<l.w*l.h; i++){
       l.delta[i] = 0 - state.input[i];
-      //im.data[i] = (float)net.input[i];
-      //im_truth.data[i] = (float)net.truth[i];
     }
-    //cuda_push_array(l.delta_gpu, l.delta, l.batch*l.outputs);
-    //save_image(im, "feature_map");
-    //save_image(im_truth, "truth");
-    //free_image(im);
-    //free_image(im_truth);
     if(state.truth){
-        logistic_x_ent_gpu(l.batch*l.inputs, l.output_gpu, state.truth_gpu, l.delta_gpu, l.loss_gpu);
+        logistic_x_ent_gpu(l.batch*l.inputs, l.output_gpu, state.truth, l.delta_gpu, l.loss_gpu);
         cuda_pull_array(l.loss_gpu, l.loss, l.batch*l.inputs);
         l.cost[0] = sum_array(l.loss, l.batch*l.inputs);
     }
@@ -80,7 +70,7 @@ void forward_logistic_layer_gpu(const layer l, network_state state)
 
 void backward_logistic_layer_gpu(const layer l, network_state state)
 {
-    axpy_ongpu(l.batch*l.inputs, 1, l.delta_gpu, 1, state.delta_gpu, 1);
+    axpy_ongpu(l.batch*l.inputs, 1, l.delta_gpu, 1, state.delta, 1);
 }
 
 #endif

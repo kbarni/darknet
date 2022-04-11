@@ -541,6 +541,34 @@ __global__ void mul_kernel(int N, float *X, int INCX, float *Y, int INCY)
     if(i < N) Y[i*INCY] *= X[i*INCX];
 }
 
+__global__ void l2norm_kernel(int N, float *x, float *dx, int batch, int filters, int spatial)
+{
+    int index = (blockIdx.x + blockIdx.y*gridDim.x) * blockDim.x + threadIdx.x;
+    if (index >= N) return;
+    int b = index / spatial;
+    int i = index % spatial;
+    int f;
+    float sum = 0;
+    for(f = 0; f < filters; ++f){
+        int index = b*filters*spatial + f*spatial + i;
+        sum += powf(x[index], 2);
+    }
+    sum = sqrtf(sum);
+    if(sum == 0) sum = 1;
+    //printf("%f\n", sum);
+    for(f = 0; f < filters; ++f){
+        int index = b*filters*spatial + f*spatial + i;
+        x[index] /= sum;
+        dx[index] = (1 - x[index]) / sum;
+    }
+}
+
+extern "C" void l2normalize_gpu(float *x, float *dx, int batch, int filters, int spatial)
+{
+    size_t N = batch*spatial;
+    l2norm_kernel<<<cuda_gridsize(N), BLOCK>>>(N, x, dx, batch, filters, spatial);
+    check_error(cudaPeekAtLastError());
+}
 
 __global__ void  fast_mean_kernel(float *x, int batch, int filters, int spatial, float *mean)
 {
@@ -1257,6 +1285,23 @@ __global__ void softmax_x_ent_kernel(int n, float *pred, float *truth, float *de
 		error[i] = (t) ? -log(p) : 0;
 		delta[i] = t - p;
 	}
+}
+
+__global__ void logistic_x_ent_kernel(int n, float *pred, float *truth, float *delta, float *error)
+{
+    int i = (blockIdx.x + blockIdx.y*gridDim.x) * blockDim.x + threadIdx.x;
+    if(i < n){
+        float p = pred[i];
+	float t = truth[i];
+        error[i] = -t*log(p+.0000001) - (1-t)*log(1-p+.0000001);
+        delta[i] = t-p;
+    }
+}
+
+extern "C" void logistic_x_ent_gpu(int n, float *pred, float *truth, float *delta, float *error)
+{
+    logistic_x_ent_kernel<<<cuda_gridsize(n), BLOCK>>>(n, pred, truth, delta, error);
+    check_error(cudaPeekAtLastError());
 }
 
 extern "C" void softmax_x_ent_gpu(int n, float *pred, float *truth, float *delta, float *error)
