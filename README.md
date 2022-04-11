@@ -69,6 +69,8 @@ backup = backup/
     ./darknet classifier test mydata.data network.cfg network.weights testimage.jpg
     
 
+For a more detailed description check the [CIFAR-10 classifier training tutorial](https://pjreddie.com/darknet/train-cifar/).
+
 ## Detection
 
 - Generate label file for your files in format (x,y,w,h are relative to the image size):
@@ -84,6 +86,7 @@ backup = backup/
 
     ./darknet detector test mydata.data network.cfg network.weights testimage.jpg
 
+For more details, refer to the [Yolo tutorial](https://pjreddie.com/darknet/yolo/) and [AlexeyAB's wiki](https://github.com/AlexeyAB/darknet/wiki/Train-and-Evaluate-Detector-on-Pascal-VOC-(VOCtrainval-2007-2012)-dataset).
 
 ## Segmentation
 
@@ -105,6 +108,10 @@ backup = backup/
 - Test the trained network on an image:
 
     ./darknet segmenter test mydata.data network.cfg network.weights testimage.jpg
+
+## C++
+
+For using Darknet in C++ with OpenCV, please refer to the sample files in the `examples` folder.
 
 # Further reading:
 
