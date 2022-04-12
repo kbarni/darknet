@@ -1,7 +1,7 @@
 #include "logistic_layer.h"
 #include "activations.h"
 #include "blas.h"
-#include "cuda.h"
+#include "dark_cuda.h"
 
 #include <float.h>
 #include <math.h>
@@ -55,14 +55,14 @@ void backward_logistic_layer(const layer l, network_state state)
 void forward_logistic_layer_gpu(const layer l, network_state state)
 {
     int i, j, k;
-    copy_ongpu(l.outputs*l.batch, state.input, 1, l.output_gpu, 1);
+    copy_ongpu(l.outputs*l.batch, *state.net.input_gpu, 1, l.output_gpu, 1);
     activate_array_ongpu(l.output_gpu, l.outputs*l.batch, LOGISTIC);
     cuda_pull_array(l.output_gpu, state.input, l.batch*l.inputs);
     for(i=0; i<l.w*l.h; i++){
       l.delta[i] = 0 - state.input[i];
     }
     if(state.truth){
-        logistic_x_ent_gpu(l.batch*l.inputs, l.output_gpu, state.truth, l.delta_gpu, l.loss_gpu);
+        logistic_x_ent_gpu(l.batch*l.inputs, l.output_gpu, *state.net.truth_gpu, l.delta_gpu, l.loss_gpu);
         cuda_pull_array(l.loss_gpu, l.loss, l.batch*l.inputs);
         l.cost[0] = sum_array(l.loss, l.batch*l.inputs);
     }
@@ -70,7 +70,7 @@ void forward_logistic_layer_gpu(const layer l, network_state state)
 
 void backward_logistic_layer_gpu(const layer l, network_state state)
 {
-    axpy_ongpu(l.batch*l.inputs, 1, l.delta_gpu, 1, state.delta, 1);
+    axpy_ongpu(l.batch*l.inputs, 1, l.delta_gpu, 1, state.net.delta_gpu, 1);
 }
 
 #endif

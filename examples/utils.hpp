@@ -38,16 +38,15 @@ float *MatToBuffer(cv::Mat img, network *net)
 
 cv::Mat resultToMat(float *pred, network *net)
 {
-    int ln=net->n-2;
-    layer l = net->layers[ln];
-    cv::Mat result(l.out_h,l.out_w,CV_8UC3);
-    int net_size=l.out_h*l.out_w;
+    cv::Mat result(net->h,net->w,CV_8UC3);
+    int net_size=net->h*net->w;
+    int ch=net->outputs/net_size;
     cv::Vec3b *ptr=(cv::Vec3b*)result.ptr();
     for(int p=0;p<net_size;p++){
         float mp=0;
         int cl=0;
-        for(int k=0;k<l.out_c;k++){
-            if(l.output[k*net_size+p]>mp){mp=l.output[k*net_size+p];cl=k;}
+        for(int k=0;k<ch;k++){
+            if(pred[k*net_size+p]>mp){mp=pred[k*net_size+p];cl=k;}
         }
         ptr[p]=colorize(cl);
     }

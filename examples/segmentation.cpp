@@ -3,9 +3,9 @@
 #include "darknet.h"
 #include "utils.hpp"
 
-#define NETWORK_CFG ""
-#define NETWORK_WEIGHTS ""
-#define IMAGE ""
+#define NETWORK_CFG "/home/barna/source-installers/darknet/cfg/unet_segment.cfg"
+#define NETWORK_WEIGHTS "/home/barna/source-installers/darknet_modded_yolo/test/instance_segment_161000.weights"
+#define IMAGE "/home/barna/source-installers/darknet_modded_yolo/test/pic2.png"
 
 int main()
 {

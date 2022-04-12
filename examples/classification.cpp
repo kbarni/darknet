@@ -13,6 +13,7 @@ int main()
     std::cout<<" -> Loading image..."<<std::endl;
     cv::Mat img = cv::imread("../data/eagle.jpg");
     float *blob = MatToBuffer(img,net);
+    net->batch=1;
     std::cout<<" -> Predicting..."<<std::endl;
     float *pred = network_predict(*net,blob);
     delete[] blob;
@@ -23,7 +24,7 @@ int main()
     }
     std::cout<<"      Predicted class: "<<cls<<" probability: "<<max<<std::endl;
     free_network_ptr(net);
-    free(pred);
+    //free(pred);
     std::cout<<"Ready"<<std::endl;
     return 0;
 }

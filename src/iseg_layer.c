@@ -2,7 +2,9 @@
 #include "activations.h"
 #include "blas.h"
 #include "box.h"
-#include "cuda.h"
+#ifdef GPU
+#include <cuda.h>
+#endif
 #include "utils.h"
 
 #include <stdio.h>
